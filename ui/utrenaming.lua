@@ -13,7 +13,8 @@ local function init()
 
 	menu.registerCallback("utRenaming_setupInfoSubmenuRows", utRenaming.setupInfoSubmenuRows)
 	menu.registerCallback("utRenaming_infoChangeObjectName", utRenaming.infoChangeObjectName)
-	menu.registerCallback("utRenaming_createRenameContext", utRenaming.createRenameContext)
+	menu.registerCallback("utRenaming_createRenameContext_get_startname", utRenaming.createRenameContext_get_startname)
+	menu.registerCallback("utRenaming_createRenameContext_on_after_confirm_button", utRenaming.createRenameContext_on_after_confirm_button)
 	menu.registerCallback("utRenaming_buttonRenameConfirm", utRenaming.buttonRenameConfirm)
 end
 
@@ -51,37 +52,49 @@ function utRenaming.infoChangeObjectName(objectid, text)
     SignalObject(GetComponentData(objectid, "galaxyid" ) , "Object Name Updated" , ConvertStringToLuaID(tostring(objectid)) , text)
 end
 
-function utRenaming.createRenameContext(frame, shiptable)
+function utRenaming.createRenameContext_get_startname(frame)
+	local startname
 	if not menu.contextMenuData.fleetrename then
-		if shiptable == nil then
-			for k,v in pairs(GetNPCBlackboard(ConvertStringTo64Bit(tostring(C.GetPlayerID())) , "$unformatted_names")) do
-				if not menu.contextMenuData.fleetrename then
-					for k,v in pairs(GetNPCBlackboard(ConvertStringTo64Bit(tostring(C.GetPlayerID())) , "$unformatted_names")) do
-						if tostring(k) == "ID: "..tostring(menu.contextMenuData.component) then
-							startname = v
-							break
-						end
-					end
-					return startname
-				end
+		for k,v in pairs(GetNPCBlackboard(ConvertStringTo64Bit(tostring(C.GetPlayerID())) , "$unformatted_names")) do
+			if tostring(k) == "ID: "..tostring(menu.contextMenuData.component) then
+				startname = v
+				break
 			end
-		else
-			local row = shiptable:addRow(true, { fixed = true, bgColor = Helper.color.transparent })
-			row[1]:setColSpan(6):createText(ReadText(5554302,1001), Helper.headerRowCenteredProperties)
-			
-			local row = shiptable:addRow(true, { fixed = true, bgColor = Helper.color.transparent })
-			row[1]:setColSpan(2):createButton({  }):setText(ReadText(5554302,1002), { halign = "center" })
-			row[1].handlers.onClick = function () return utRenaming.buttonMassRename("Subordinates Name Updated") end
-			row[3]:setColSpan(2):createButton({  }):setText(ReadText(5554302,1004), { halign = "center" })
-			row[3].handlers.onClick = function () return utRenaming.buttonMassRename("Subordinates Name Updated - bigships") end
-			row[5]:setColSpan(2):createButton({  }):setText(ReadText(5554302,1006), { halign = "center" })
-			row[5].handlers.onClick = function () return utRenaming.buttonMassRename("Subordinates Name Updated - smallships") end
 		end
 	end
+	return startname
+end
+
+function utRenaming.createRenameContext_on_after_confirm_button(frame, shiptable)
+	local row = shiptable:addRow(true, { fixed = true, bgColor = Helper.color.transparent })
+	row[1]:setColSpan(2):createText(ReadText(5554302,1001), Helper.headerRowCenteredProperties)
+
+	local row = shiptable:addRow(true, { fixed = true, bgColor = Helper.color.transparent })
+	row[1]:setColSpan(2):createButton({  }):setText(ReadText(5554302,1002), { halign = "center" })
+	row[1].handlers.onClick = function () return utRenaming.buttonMassRename("Subordinates Name Updated") end
+
+	local row = shiptable:addRow(true, { fixed = true, bgColor = Helper.color.transparent })
+	row[1]:setColSpan(2):createButton({  }):setText(ReadText(5554302,1004), { halign = "center" })
+	row[1].handlers.onClick = function () return utRenaming.buttonMassRename("Subordinates Name Updated - bigships") end
+
+	local row = shiptable:addRow(true, { fixed = true, bgColor = Helper.color.transparent })
+	row[1]:setColSpan(2):createButton({  }):setText(ReadText(5554302,1006), { halign = "center" })
+	row[1].handlers.onClick = function () return utRenaming.buttonMassRename("Subordinates Name Updated - smallships") end
 end
 
 function utRenaming.buttonRenameConfirm()
-	SignalObject(GetComponentData(menu.contextMenuData.component, "galaxyid" ) , "Object Name Updated" , ConvertStringToLuaID(tostring(menu.contextMenuData.component)) , menu.contextMenuData.newtext)
+	if menu.contextMenuData.uix_multiRename_objects and #menu.contextMenuData.uix_multiRename_objects > 0 then
+		-- kuertee start: uix multi-rename
+		local multirenamedobjects = {}
+		for _, object in ipairs(menu.contextMenuData.uix_multiRename_objects) do
+			multirenamedobjects[ConvertStringToLuaID(tostring(object))] = menu.contextMenuData.newtext
+		end
+		SetNPCBlackboard(ConvertStringTo64Bit(tostring(C.GetPlayerID())), "$multirenamedobjects", multirenamedobjects)
+		SignalObject(GetComponentData(menu.contextMenuData.component, "galaxyid" ) , "multirename")
+		-- kuertee end: uix multi-rename
+	else
+		SignalObject(GetComponentData(menu.contextMenuData.component, "galaxyid" ) , "Object Name Updated" , ConvertStringToLuaID(tostring(menu.contextMenuData.component)) , menu.contextMenuData.newtext)
+	end
 end
 
 function utRenaming.buttonMassRename(param)

@@ -291,6 +291,7 @@
         <cue name="NameUpdate_FromLua" instantiate="true">
           <conditions>
             <check_any>
+              <event_cue_signalled comment="uix multi-rename support" />
               <event_object_signalled object="player.galaxy" param="'Object Name Updated'" comment="for (initial) signalling from lua"/>
               <event_object_signalled object="player.galaxy" param="'Subordinates Name Updated'" comment="for (initial) signalling from lua"/>
               <event_object_signalled object="player.galaxy" param="'Subordinates Name Updated - bigships'" comment="for (initial) signalling from lua"/>
@@ -328,11 +329,18 @@
               <remove_value name="$objectname"/>
             </do_if>
             <do_else>
-              <set_value name="$object" exact="event.param2" comment="event.param2"/>
-              <set_value name="player.entity.$unformatted_names.{$object}" exact="event.param3"/>
+              <do_if value="event.name == 'event_cue_signalled'" comment="multi-rename support">
+                <set_value name="$object" exact="event.param.$object" />
+                <set_value name="$unformattedname" exact="event.param.$unformattedname" />
+              </do_if>
+              <do_else>
+                <set_value name="$object" exact="event.param2" comment="event.param2"/>
+                <set_value name="$unformattedname" exact="event.param3" />
+              </do_else>
               <!--set_value name="player.entity.$unformatted_names.{event.param2.{2}}" exact="event.param3" comment="Specifically for lua because it refuses to retrieve the unformatted name otherwise - screw lua!!!"/-->
               <!--add_to_group groupname="$NamedObjectsDynamic" object="$object"/-->
-              <do_if value="event.param3 == ''" comment="If the set Name is empty - use/re-set default name according to custom file">
+              <set_value name="player.entity.$unformatted_names.{$object}" exact="$unformattedname"/>
+              <do_if value="$unformattedname == ''" comment="If the set Name is empty - use/re-set default name according to custom file">
                 <remove_value name="player.entity.$unformatted_names.{$object}"/>
                 <signal_cue_instantly cue="NameUpdate_Initialize" param="$object"/>
               </do_if>
@@ -428,6 +436,18 @@
               <!-- Dynamic -->
               <signal_objects object="event.param.boarder" param="'Object Name Updated'"/>
             </do_if>
+          </actions>
+        </cue>
+        <cue name="MultiRename" instantiate="true" namespace="this">
+          <conditions>
+            <event_object_signalled object="player.galaxy" param="'multirename'" />
+          </conditions>
+          <actions>
+            <!-- objects in a multi-rename is in player.entity.$multirenamedobjects -->
+            <do_for_each name="$object" in="player.entity.$multirenamedobjects">
+              <signal_cue_instantly cue="NameUpdate_FromLua" param="table[$object = $object, $unformattedname = $object.knownname]" />
+            </do_for_each>
+            <remove_value name="player.entity.$multirenamedobjects" />
           </actions>
         </cue>
         <cue name="RegularUpdate">
