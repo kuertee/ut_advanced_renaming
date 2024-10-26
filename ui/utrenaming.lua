@@ -84,7 +84,6 @@ function utRenaming.createRenameContext_get_startname(frame)
 			end
 		end
 	end
-	Helper.debugText_forced("startname", startname)
 	return startname
 end
 
