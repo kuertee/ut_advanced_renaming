@@ -18,7 +18,6 @@ local function init()
 end
 
 function utRenaming.setupInfoSubmenuRows_on_end(mode, inputtable, inputobject, instance)
-	Helper.debugText_forced("setupInfoSubmenuRows")
 	if inputtable.rows[4][4] and inputtable.rows[4][4]["type"] == "editbox" then
 		--Lib.Print_Table(inputtable.rows[4][4], "1st column")
 		
