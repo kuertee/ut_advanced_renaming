@@ -10,25 +10,47 @@ local function init()
 	-- DebugError("UniTrader Advanced Rename Init")
 
 	menu = Lib.Get_Egosoft_Menu("MapMenu")
-
-	menu.registerCallback("utRenaming_setupInfoSubmenuRows", utRenaming.setupInfoSubmenuRows)
+	menu.registerCallback("utRenaming_setupInfoSubmenuRows_on_end", utRenaming.setupInfoSubmenuRows_on_end)
 	menu.registerCallback("utRenaming_infoChangeObjectName", utRenaming.infoChangeObjectName)
 	menu.registerCallback("utRenaming_createRenameContext_get_startname", utRenaming.createRenameContext_get_startname)
 	menu.registerCallback("utRenaming_createRenameContext_on_after_confirm_button", utRenaming.createRenameContext_on_after_confirm_button)
 	menu.registerCallback("utRenaming_buttonRenameConfirm", utRenaming.buttonRenameConfirm)
 end
 
-function utRenaming.setupInfoSubmenuRows(row, instance, inputobject, objectname)
-	row[2]:createText(locrowdata[2], { minRowHeight = config.mapRowHeight, fontsize = config.mapFontSize, font = Helper.standardFont, x = Helper.standardTextOffsetx })
-
-	local index, span = 4, 5
-	if ReadText(5554302, 2) == "yes" then 
-		index, span = 3, 6
+function utRenaming.setupInfoSubmenuRows_on_end(mode, inputtable, inputobject, instance)
+	Helper.debugText_forced("setupInfoSubmenuRows")
+	if inputtable.rows[4][4] and inputtable.rows[4][4]["type"] == "editbox" then
+		--Lib.Print_Table(inputtable.rows[4][4], "1st column")
+		
+		-- needs to be done the complicated way, because lua...
+		--Lib.Print_Table(GetNPCBlackboard(ConvertStringTo64Bit(tostring(C.GetPlayerID())) , "$unformatted_names"), "Name Table")
+		local editname
+		for k,v in pairs(GetNPCBlackboard(ConvertStringTo64Bit(tostring(C.GetPlayerID())) , "$unformatted_names")) do
+			--DebugError(tostring(k))
+			--DebugError("ID: "..tostring(inputobject))
+			if tostring(k) == "ID: "..tostring(inputobject) then
+				editname = v
+				--DebugError(editname)
+				break
+			end
+		end
+		if ReadText(5554302, 2) == "yes" then 
+			-- Make Editbox bigger - produces some harmless errors
+			inputtable.rows[4][2]:setColSpan(1)
+			inputtable.rows[4][3]:setColSpan(6):createEditBox({ height = config.mapRowHeight, description = locrowdata[2] }):setText(editname or inputtable.rows[4][4].properties.text.text, { halign = "right" })
+			inputtable.rows[4][3].handlers.onEditBoxDeactivated = function(_, text, textchanged)
+				return orig.menu.infoChangeObjectName(inputobject, text, textchanged)
+			end
+		else
+			-- just replace the String if appliable - error free, but smaller text field
+			if editname then
+				inputtable.rows[4][4]:setText(editname)
+			end
+			inputtable.rows[4][4].handlers.onEditBoxDeactivated = function(_, text, textchanged)
+				return orig.menu.infoChangeObjectName(inputobject, text, textchanged)
+			end
+		end
 	end
-
-	menu.shipNameEditBox = row[index]:setColSpan(span):createEditBox({ height = config.mapRowHeight, description = locrowdata[2] }):setText(objectname, { halign = "right" })
-	row[index].handlers.onEditBoxActivated = function (widget) return utRenaming.unformatText(widget, instance, inputobject, row) end
-	row[index].handlers.onEditBoxDeactivated = function(_, text, textchanged) return menu.infoChangeObjectName(inputobject, text, textchanged) end
 end
 
 function utRenaming.unformatText(widget, instance, inputobject, row)
@@ -62,6 +84,7 @@ function utRenaming.createRenameContext_get_startname(frame)
 			end
 		end
 	end
+	Helper.debugText_forced("startname", startname)
 	return startname
 end
 
