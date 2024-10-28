@@ -38,7 +38,7 @@ function utRenaming.setupInfoSubmenuRows_on_end(mode, inputtable, inputobject, i
 			inputtable.rows[4][2]:setColSpan(1)
 			inputtable.rows[4][3]:setColSpan(6):createEditBox({ height = config.mapRowHeight, description = locrowdata[2] }):setText(editname or inputtable.rows[4][4].properties.text.text, { halign = "right" })
 			inputtable.rows[4][3].handlers.onEditBoxDeactivated = function(_, text, textchanged)
-				return orig.menu.infoChangeObjectName(inputobject, text, textchanged)
+				return menu.infoChangeObjectName(inputobject, text, textchanged)
 			end
 		else
 			-- just replace the String if appliable - error free, but smaller text field
@@ -46,7 +46,7 @@ function utRenaming.setupInfoSubmenuRows_on_end(mode, inputtable, inputobject, i
 				inputtable.rows[4][4]:setText(editname)
 			end
 			inputtable.rows[4][4].handlers.onEditBoxDeactivated = function(_, text, textchanged)
-				return orig.menu.infoChangeObjectName(inputobject, text, textchanged)
+				return menu.infoChangeObjectName(inputobject, text, textchanged)
 			end
 		end
 	end
