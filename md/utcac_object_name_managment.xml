@@ -1,40 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <mdscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="UT_CAC_Object_Name_Managment" xsi:noNamespaceSchemaLocation="http://localhost/x4mod/libraries/md.xsd">
   <cues>
-    <!--cue name="RegisterUI_G_Workaround" version="1" instantiate="true">
-      <conditions>
-        <event_cue_completed cue="md.G_Work_Around.Init"/>
-        <check_value value="md.G_Work_Around.Signal.exists" negate="true" comment="use latest lua load API if present"/>
-        <check_value value="md.Lua_Loader.Reload_Listener.exists" negate="true" comment="use latest lua load API if present"/>
-      </conditions>
-      <actions>
-        <debug_text filter="general" text="'utrenaming g workaround call'" chance="0"/>
-        <raise_lua_event name="'RegisterAddon'" param="'extensions.ut_advanced_renaming.utrenaming'"/>
-      </actions>
-    </cue>
-    <cue name="RegisterUI_G_Workaround_020" version="1" instantiate="true">
-      <conditions>
-        <event_game_loaded/>
-        <check_value value="md.G_Work_Around.Signal.exists"/>
-        <check_value value="md.Lua_Loader.Reload_Listener.exists" negate="true" comment="use latest lua load API if present"/>
-      </conditions>
-      <delay exact="1s"/>
-      <actions>
-        <debug_text filter="general" text="'utrenaming g workaround 020 call'" chance="0"/>
-        <signal_cue_instantly cue="md.G_Work_Around.Signal" param="'.\\extensions\\ut_advanced_renaming\\utrenaming.lua'"/>
-      </actions>
-    </cue-->
-    <cue name="RegisterUI_Lua_Loader" instantiate="true">
-      <conditions>
-        <event_ui_triggered screen="'Lua_Loader'" control="'Ready'"/>
-      </conditions>
-      <delay min="10ms" max="100ms"/>
-      <actions>
-        <debug_text filter="general" text="'utrenaming lua loader call'" chance="0"/>
-        <raise_lua_event name="'Lua_Loader.Load'" param="'extensions.kuertee_ui_extensions.ui.kuertee_menu_map'"/>
-        <raise_lua_event name="'Lua_Loader.Load'" param="'extensions.ut_advanced_renaming.ui.utrenaming'"/>
-      </actions>
-    </cue>
     <cue name="Init" version="3">
       <actions>
         <!-- Set Up all Groups needed for Automatic Name Upates -->
