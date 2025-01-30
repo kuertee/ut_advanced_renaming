@@ -225,7 +225,7 @@
                       <replace string="{5554302,20}" with="''"/>
                     </substitute_text>
                   </do_else>
-                  <set_value name="player.entity.$unformatted_names.{$object}" exact="player.entity.$unformatted_names.{$object} + event.name" comment="temp for debug"/>
+                  <!-- <set_value name="player.entity.$unformatted_names.{$object}" exact="player.entity.$unformatted_names.{$object} + event.name" comment="temp for debug"/> -->
                   <debug_text filter="general" text="'Name set to %1'.[player.entity.$unformatted_names.{$object}]" chance="0"/>
                   <include_actions ref="RenameActions"/>
                 </do_if>
