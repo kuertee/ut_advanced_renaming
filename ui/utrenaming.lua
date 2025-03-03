@@ -1,15 +1,13 @@
 local ffi = require("ffi")
 local C = ffi.C
 
-local Lib = require("extensions.sn_mod_support_apis.lua_library")
 
 local menu = {}
 local utRenaming = {}
 
 local function init()
 	-- DebugError("UniTrader Advanced Rename Init")
-
-	menu = Lib.Get_Egosoft_Menu("MapMenu")
+	menu = Helper.getMenu("MapMenu")
 	menu.registerCallback("utRenaming_setupInfoSubmenuRows_on_end", utRenaming.setupInfoSubmenuRows_on_end)
 	menu.registerCallback("utRenaming_infoChangeObjectName", utRenaming.infoChangeObjectName)
 	menu.registerCallback("utRenaming_createRenameContext_get_startname", utRenaming.createRenameContext_get_startname)
@@ -19,10 +17,10 @@ end
 
 function utRenaming.setupInfoSubmenuRows_on_end(mode, inputtable, inputobject, instance)
 	if inputtable.rows[4][4] and inputtable.rows[4][4]["type"] == "editbox" then
-		--Lib.Print_Table(inputtable.rows[4][4], "1st column")
+		--Helper.debugText_forced(inputtable.rows[4][4], "1st column")
 		
 		-- needs to be done the complicated way, because lua...
-		--Lib.Print_Table(GetNPCBlackboard(ConvertStringTo64Bit(tostring(C.GetPlayerID())) , "$unformatted_names"), "Name Table")
+		--Helper.debugText_forced(GetNPCBlackboard(ConvertStringTo64Bit(tostring(C.GetPlayerID())) , "$unformatted_names"), "Name Table")
 		local editname
 		for k,v in pairs(GetNPCBlackboard(ConvertStringTo64Bit(tostring(C.GetPlayerID())) , "$unformatted_names")) do
 			--DebugError(tostring(k))
